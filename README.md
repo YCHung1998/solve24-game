@@ -5,6 +5,12 @@
 
 > Developed by Dr. CV
 
+## 立即遊玩
+
+**[https://solve24-game.onrender.com/](https://solve24-game.onrender.com/)**
+
+> 首次開啟若需等待 30–60 秒，是 Render free tier 冷啟動，請稍候。
+
 ---
 
 ## 專案架構
