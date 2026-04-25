@@ -3,6 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Runtime data (persistent across deployments is not guaranteed)
+data/game_count.txt
+
 # C extensions
 *.so
 

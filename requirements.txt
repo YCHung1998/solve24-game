@@ -1,2 +1,2 @@
-streamlit
-fastmcp
+streamlit>=1.40.0
+fastmcp>=2.0.0

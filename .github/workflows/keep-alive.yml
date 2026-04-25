@@ -1,0 +1,27 @@
+name: Keep Alive
+
+# 每 20 分鐘 ping 一次 Render app，防止 free tier 進入 idle 休眠。
+# 需在 GitHub Repo → Settings → Secrets → Actions 新增：
+#   RENDER_APP_URL  ← 你的 Render 公開網址 (e.g. https://solve24-game.onrender.com)
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping Render App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wake up app
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 \
+            "${{ secrets.RENDER_APP_URL }}")
+          echo "HTTP status: $STATUS"
+          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 500 ]; then
+            echo "::warning::App returned $STATUS — might be down"
+            exit 1
+          fi

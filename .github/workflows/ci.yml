@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Solver correctness
+        run: |
+          python - <<'EOF'
+          from core.solver import Solver24, check_user_answer
+
+          # 8/8/3/3 是經典有解題
+          assert Solver24(["8","8","3","3"]).solve(), "8 8 3 3 should be solvable"
+
+          # 驗算合法算式
+          ok, _ = check_user_answer(["3","3","8","8"], "(8/(3-(8/3)))", 24.0)
+          assert ok, "valid expression should pass"
+
+          # 拒絕非法字元
+          ok, _ = check_user_answer(["1","2","3","4"], "__import__('os')", 24.0)
+          assert not ok, "illegal chars must be rejected"
+
+          print("Solver tests passed.")
+          EOF
+
+      - name: Analyzer correctness
+        run: |
+          python - <<'EOF'
+          from core.analyzer import analyze_game_difficulty
+          r = analyze_game_difficulty(24.0)
+          assert r["solvable"] > 0 and r["unsolvable"] > 0
+          assert 0 < r["ratio"] < 1
+          print(f"Solvable ratio: {r['ratio']:.1%} — OK")
+          EOF
+
+      - name: MCP server import check
+        run: python -c "import interfaces.mcp.server; print('MCP import OK')"
